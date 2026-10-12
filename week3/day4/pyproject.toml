@@ -1,0 +1,23 @@
+[project]
+name = "day4"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "omadke", email = "omadke799@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "groq>=1.7.0",
+    "numpy>=2.5.3",
+    "qdrant-client>=1.19.1",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+day4 = "day4:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"

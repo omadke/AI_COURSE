@@ -1,0 +1,116 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from groq import Groq
+from time import sleep
+
+load_dotenv()
+my_api_key = os.getenv("GROQ_API_KEY")  
+
+if not my_api_key:
+    raise ValueError("api key not found")
+
+client = Groq(api_key= my_api_key)
+
+model = "openai/gpt-oss-120b"
+
+def ask_llm(system_prompt, user_prompt):
+    user_message ={
+        "role" : "user",
+        "content" : user_prompt
+    }
+
+    sys_message = {
+        "role" : "system",
+        "content" : system_prompt
+    }
+
+    messages = [user_message, sys_message]
+    resposne=client.chat.completions.create(model=model, messages=messages)
+    answer=resposne.choices[0].message.content
+    return answer
+
+JD = """
+**Software Developer Intern**
+
+We are looking for a motivated Software Developer Intern to help build and maintain software applications. The role involves writing clean code, debugging issues, working with APIs, and collaborating with the development team.
+
+**Requirements:**
+
+* Basic knowledge of Python/Java
+* Understanding of Data Structures and Algorithms
+* Familiarity with Git and REST APIs
+* Good problem-solving skills
+* Willingness to learn new technologies
+
+"""
+RESUME = """
+Name: Rahul Sharma
+
+Experience:
+3 years as a Software Developer.
+
+Skills:
+Python, FastAPI, MySQL, Docker,
+REST APIs, Git
+
+Projects:
+Built a food delivery backend using
+FastAPI and MySQL.
+
+Deployed applications using Docker.
+"""
+
+def extract_JD(JD):
+    print("step 1")
+    system_prompt = """
+    Your a expert HR assistant extract the information from the job description and give
+    only the skills that are given in jd dont invent new skills just give the skills that
+    are mentioned in the job description 
+    """
+    user_prompt = f"extract the skills from this job description {JD} "
+
+    return ask_llm(system_prompt, user_prompt)
+
+def extract_resume(RESUME):
+    print("step2")
+    system_prompt = """
+    your a expert HR assistant extract the information from resume and give the skills 
+    of the candidate only give the skills that are mentioned in the candidates resume
+    dont invent new skills by youe own only exctract the skills that are mentioned in the 
+    resume
+    """
+    user_prompt =f"extract the skills from this resume {RESUME} "
+
+    return ask_llm(system_prompt, user_prompt)
+
+def skill_matcher(candidate, jd):
+    print("step3")
+    system_prompt = """
+    You are a professional HR assistant. compare the skills of candidate and the skills required in the JD and produce a final score between
+    1 and 100. also produce a short verdict whther the candidate is a good fit for the role.
+    output format:
+    dont give me fancy output just give what skills are matched which skills are not matched
+    and what are the additional skill and then give me the score and then the final verdict
+    """
+    user_prompt = f"""
+     Compare and matc h the skills
+    JD:
+    {jd}
+    Candidate:
+    {candidate}
+    """
+    return ask_llm(system_prompt, user_prompt)
+
+jd = extract_JD(JD)
+print(jd)
+sleep(2)
+candidate = extract_resume(RESUME)
+print(candidate)
+sleep(2)
+match = skill_matcher(candidate, jd)
+print(match)
+
+
+    
+

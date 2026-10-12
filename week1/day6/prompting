@@ -1,0 +1,50 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
+my_api_key = os.getenv("GROQ_API_KEY")
+
+if not my_api_key:
+    raise ValueError("api key not found")
+
+client = Groq(api_key = my_api_key)
+
+model = "openai/gpt-oss-120b"
+role = "user"
+
+prompt = """
+#role
+you are a customer assistant at mobile shop or laptop shop
+
+#task
+you have to classify the problem 
+
+#constraint
+you have to classify the issue in only three categories billing, technical, return
+
+#output format
+only one word answer
+
+#example
+suppose you have complain that laptop is not getting on so the issue should be classified in technical
+
+#fallback
+if the issue is not related to any of the category return other
+
+issue:
+the laptop is not getting charged
+"""
+
+message ={
+    "role" : role,
+    "content"  : prompt
+}
+
+messages = [message]
+
+response = client.chat.completions.create(model = model, messages = messages)
+
+answer = response.choices[0].message.content
+print(answer)
